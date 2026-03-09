@@ -19,8 +19,10 @@ logger = logging.getLogger("skill_idea_miner")
 
 PROJECT_ALLOWLIST = [
     "claude-trading-skills",
+    "claude-market-agents",
     "trade-edge-finder",
     "trade-strategy-pipeline",
+    "weekly-trade-strategy",
 ]
 
 CLAUDE_TIMEOUT = 600
@@ -488,8 +490,16 @@ def _build_llm_prompt(signals: dict, user_samples: list[str], project_name: str)
     """Build the LLM prompt for skill idea abstraction."""
     parts = [
         f"Project: {project_name}\n",
-        "Analyze the following session signals and user message samples to suggest",
-        "new Claude skill ideas that would automate or improve the user's workflow.\n",
+        "This project is a trading and investing skill library. "
+        "Analyze the following session signals and user message samples to suggest "
+        "new Claude skill ideas focused on TRADING, INVESTING, and MARKET ANALYSIS.\n",
+        "\n## IMPORTANT CONSTRAINTS\n",
+        "- ONLY propose skills directly related to: stock/options trading, market analysis, "
+        "portfolio management, risk management, economic/earnings data, technical/fundamental "
+        "analysis, or trade execution workflows.",
+        "- DO NOT propose developer-tooling, code-navigation, documentation-generation, "
+        "or general-purpose software engineering skills. Those belong to a separate project.",
+        "- Each skill idea must clearly describe how it helps a trader or investor.\n",
         "\n## Signals\n",
     ]
 
