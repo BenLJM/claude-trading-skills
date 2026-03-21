@@ -382,6 +382,7 @@ def analyze_stock(
         "execution_state": execution_state,
         "execution_state_reasons": exec_state_result.get("reasons", []),
         "pattern_type": pattern_type,
+        "wide_and_loose": wide_and_loose,
         "state_cap_applied": composite.get("state_cap_applied", False),
         "cap_reason": composite.get("cap_reason"),
         "sma200_distance_pct": round(sma200_distance_pct, 1)

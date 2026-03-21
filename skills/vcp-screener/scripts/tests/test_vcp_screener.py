@@ -3241,3 +3241,113 @@ class TestPhase5StrictMode:
             "Breakout",
         )
         assert strict_ok is True
+
+
+# ---------------------------------------------------------------------------
+# Regression: wide_and_loose preserved through rerank path
+# ---------------------------------------------------------------------------
+
+
+class TestWideAndLooseRerank:
+    """Verify wide_and_loose is persisted in result dict for rerank path."""
+
+    def test_wide_and_loose_in_analyze_stock_result(self):
+        """analyze_stock() must include wide_and_loose at top level."""
+        prices = _make_prices(250, start=100.0, daily_change=0.001, volume=1_000_000)
+        sp500 = _make_prices(250, start=400.0, daily_change=0.0005)
+        quote = {
+            "price": prices[0]["close"],
+            "marketCap": 10_000_000_000,
+            "yearHigh": prices[0]["high"] * 1.1,
+            "yearLow": prices[-1]["low"],
+        }
+        result = analyze_stock(
+            symbol="TEST",
+            historical=prices,
+            quote=quote,
+            sp500_history=sp500,
+        )
+        assert result is not None
+        assert "wide_and_loose" in result
+        assert isinstance(result["wide_and_loose"], bool)
+
+    def test_wide_and_loose_cap_survives_rerank(self):
+        """When wide_and_loose=True, re-calling calculate_composite_score must
+        still apply the Developing VCP cap (not lose it)."""
+        result = calculate_composite_score(
+            trend_score=95.0,
+            contraction_score=95.0,
+            volume_score=90.0,
+            pivot_score=90.0,
+            rs_score=90.0,
+            valid_vcp=True,
+            execution_state="Pre-breakout",
+            wide_and_loose=True,
+        )
+        assert result["rating"] == "Developing VCP"
+
+        # Simulate rerank: same call again with updated RS
+        result2 = calculate_composite_score(
+            trend_score=95.0,
+            contraction_score=95.0,
+            volume_score=90.0,
+            pivot_score=90.0,
+            rs_score=85.0,  # changed RS
+            valid_vcp=True,
+            execution_state="Pre-breakout",
+            wide_and_loose=True,  # must still be passed
+        )
+        assert result2["rating"] == "Developing VCP"
+        assert result2["state_cap_applied"] is True
+
+
+# ---------------------------------------------------------------------------
+# Regression: Early-post-breakout state cap
+# ---------------------------------------------------------------------------
+
+
+class TestEarlyPostBreakoutCap:
+    """Verify Early-post-breakout caps at Strong VCP."""
+
+    def test_early_post_breakout_caps_textbook(self):
+        """Textbook score + Early-post-breakout → Strong VCP (not Textbook)."""
+        result = calculate_composite_score(
+            trend_score=95.0,
+            contraction_score=95.0,
+            volume_score=90.0,
+            pivot_score=90.0,
+            rs_score=90.0,
+            valid_vcp=True,
+            execution_state="Early-post-breakout",
+        )
+        assert result["rating"] == "Strong VCP"
+        assert result["state_cap_applied"] is True
+
+    def test_early_post_breakout_does_not_cap_strong(self):
+        """Strong VCP + Early-post-breakout → Strong VCP (no downgrade)."""
+        result = calculate_composite_score(
+            trend_score=85.0,
+            contraction_score=85.0,
+            volume_score=80.0,
+            pivot_score=80.0,
+            rs_score=80.0,
+            valid_vcp=True,
+            execution_state="Early-post-breakout",
+        )
+        assert result["rating"] == "Strong VCP"
+        assert result["state_cap_applied"] is False
+
+    def test_pivot_above_no_volume_is_early_post_breakout(self):
+        """0-3% above pivot without volume → Early-post-breakout (not Pre-breakout)."""
+        from calculators.execution_state import compute_execution_state
+
+        result = compute_execution_state(
+            distance_from_pivot_pct=1.5,
+            price=102.0,
+            sma50=98.0,
+            sma200=90.0,
+            sma200_distance_pct=13.3,
+            last_contraction_low=None,
+            breakout_volume=False,
+        )
+        assert result["state"] == "Early-post-breakout"

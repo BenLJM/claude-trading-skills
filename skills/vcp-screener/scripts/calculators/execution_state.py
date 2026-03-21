@@ -136,7 +136,7 @@ STATE_MAX_RATING = {
     "Damaged": "No VCP",
     "Overextended": "Weak VCP",
     "Extended": "Developing VCP",
-    "Early-post-breakout": None,  # No cap
+    "Early-post-breakout": "Strong VCP",  # Cap: breakout in progress, not yet confirmed
     "Breakout": None,  # No cap
     "Pre-breakout": None,  # No cap
 }

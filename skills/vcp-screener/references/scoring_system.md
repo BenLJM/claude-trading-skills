@@ -25,15 +25,16 @@ Each of the 7 criteria contributes 14.3 points:
 
 **Pass threshold:** Raw score >= 85 (6+ criteria) to proceed to VCP analysis.
 
-**SMA200 Extension Penalty** (applied after raw score, when price is overextended above SMA200):
+**SMA200 Extension Penalty** (metadata only -- NOT applied to the trend template score):
 
-| Price above SMA200 | Excess above threshold (50%) | Penalty |
-|--------------------|------------------------------|---------|
-| > 50% + 20pp (≥70%) | ≥ 20pp | -20 |
-| > 50% + 10pp (≥60%) | ≥ 10pp | -15 |
-| > 50% (any) | < 10pp | -10 |
+| Price above SMA200 | Penalty (stored as metadata) |
+|--------------------|------------------------------|
+| > 70% | -20 |
+| > 60% | -15 |
+| > 50% | -10 |
+| > 40% | -5 |
 
-The pass filter uses `raw_score` (before this penalty) so the penalty affects scoring only, not pipeline admission.
+The SMA200 penalty is computed and stored in `sma200_penalty` / `sma200_distance_pct` for downstream use by the Execution State engine (Overextended classification). It is intentionally excluded from the trend template score to avoid double-penalizing with state caps.
 
 ### 2. Contraction Quality (0-100)
 
@@ -163,8 +164,8 @@ Each execution state imposes a maximum allowable rating regardless of composite 
 |----------------|----------------|-----------|
 | `Invalid` | No VCP | Price structure failed completely |
 | `Damaged` | No VCP | Pattern invalidated by breach of low |
-| `Overextended` | Developing VCP | Too extended for a safe entry |
-| `Extended` | Weak VCP | Chasing risk too high |
+| `Overextended` | Weak VCP | Too extended for a safe entry |
+| `Extended` | Developing VCP | Chasing risk too high |
 | `Early-post-breakout` | Strong VCP | Breakout in progress; watch for follow-through |
 | `Breakout` | Textbook VCP | No cap — valid breakout |
 | `Pre-breakout` | Textbook VCP | No cap — ideal setup |
@@ -173,7 +174,7 @@ When a cap is applied, `state_cap_applied=True` and `★` appears in the Quick S
 
 ### Wide-and-Loose Cap
 
-When the final contraction has `depth_pct > 15%` AND `duration_days < 10`, the pattern is flagged as `wide_and_loose=True` and capped at **Strong VCP** (prevents Textbook rating for sloppy late contractions).
+When the final contraction has `depth_pct > 15%` AND `duration_days < 10`, the pattern is flagged as `wide_and_loose=True` and capped at **Developing VCP** (prevents Textbook/Strong/Good ratings for sloppy late contractions).
 
 ---
 
