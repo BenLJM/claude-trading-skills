@@ -134,7 +134,7 @@ def parse_arguments():
     )
 
     # Output
-    parser.add_argument("--output-dir", default=".", help="Output directory for reports")
+    parser.add_argument("--output-dir", default="reports/", help="Output directory for reports")
 
     return parser.parse_args()
 
