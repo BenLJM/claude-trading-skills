@@ -248,25 +248,53 @@ The skill generates two output files in the `reports/` directory:
 **JSON Output** (`theme_detector_YYYY-MM-DD_HHMMSS.json`):
 ```json
 {
+  "report_type": "theme_detector",
+  "generated_at": "2026-04-18 10:30:00",
   "metadata": {
-    "generated_at": "2026-04-18T10:30:00Z",
+    "generated_at": "2026-04-18 10:30:00",
+    "data_mode": "full",
     "finviz_mode": "elite",
-    "themes_analyzed": 14
-  },
-  "themes": [
-    {
-      "name": "AI & Machine Learning",
-      "heat_score": 85,
-      "direction": "bullish",
-      "lifecycle": "Accelerating",
-      "confidence": "Medium",
-      "industries": ["Software - Infrastructure", "Semiconductors"],
-      "top_stocks": ["NVDA", "MSFT", "GOOGL"],
-      "etf_count": 12
+    "fmp_available": true,
+    "max_themes": 14,
+    "max_stocks_per_theme": 5,
+    "data_sources": {
+      "finviz_industries": 152,
+      "yfinance_stocks": 68,
+      "etf_volume": 24
     }
-  ],
-  "industry_rankings": [...],
-  "sector_uptrend_ratios": [...]
+  },
+  "summary": {
+    "total_themes": 14,
+    "bullish_count": 8,
+    "bearish_count": 6,
+    "top_bullish": "AI & Machine Learning",
+    "top_bearish": "Regional Banks"
+  },
+  "themes": {
+    "all": [
+      {
+        "name": "AI & Machine Learning",
+        "direction": "bullish",
+        "heat": 85.3,
+        "maturity": 42.1,
+        "stage": "Accelerating",
+        "confidence": "Medium",
+        "heat_label": "Hot",
+        "industries": ["Software - Infrastructure", "Semiconductors"],
+        "representative_stocks": [{"symbol": "NVDA"}, {"symbol": "MSFT"}],
+        "proxy_etfs": ["BOTZ", "ROBO"],
+        "theme_origin": "seed"
+      }
+    ],
+    "bullish": [...],
+    "bearish": [...]
+  },
+  "industry_rankings": {
+    "top": [...],
+    "bottom": [...]
+  },
+  "sector_uptrend": {...},
+  "data_quality": {...}
 }
 ```
 
@@ -277,14 +305,16 @@ The skill generates two output files in the `reports/` directory:
 - Sector uptrend ratio summary
 - Methodology notes
 
-**Key Output Fields:**
+**Key Output Fields (per theme):**
 | Field | Description |
 |-------|-------------|
-| `heat_score` | 0-100 direction-neutral theme strength |
-| `direction` | "bullish" (LEAD) or "bearish" (LAG) |
-| `lifecycle` | Emerging / Accelerating / Trending / Mature / Exhausting |
+| `heat` | 0-100 direction-neutral theme strength |
+| `direction` | `"bullish"` (LEAD) or `"bearish"` (LAG) |
+| `stage` | Emerging / Accelerating / Trending / Mature / Exhausting |
 | `confidence` | Low / Medium / High (script caps at Medium; WebSearch can elevate) |
-| `etf_count` | Number of thematic ETFs (higher = more crowded) |
+| `representative_stocks` | Top stocks for the theme (list of objects with `symbol` and metrics) |
+| `proxy_etfs` | Thematic ETF tickers (length = ETF count; higher = more crowded) |
+| `theme_origin` | `"seed"` (from YAML config) or `"discovered"` (auto-clustered) |
 
 ---
 
