@@ -9,6 +9,7 @@ Filename convention: `YYYY-MM-DD_<topic>.md`
 | Date | Brief | One-line summary |
 |---|---|---|
 | 2026-04-22 | [AI Infra Opportunity Brief](./2026-04-22_ai-infra-opportunity-brief.md) | Maps the AI-infra value chain (8 layers) against a NVDA-concentrated portfolio; identifies memory (MU), equipment (AMAT/LRCX/KLAC), networking (AVGO/ANET), power (CEG/VST), and data-center REITs (EQIX/DLR) as the underweight layers. |
+| 2026-05-05 | [单一标的选股分析（中文）](./2026-05-05_ai-infra-stock-pick-zh.md) | 基于自选股 AMD/MU/INTC/MRVL/SIMO，用 $10k 选一只"稳"的标的：综合评分 MRVL 7.0 居首，建议三段式建仓而非一次性 all-in；同时指出 VST 是更稳的板块外备选。 |
 
 ## How to read
 
